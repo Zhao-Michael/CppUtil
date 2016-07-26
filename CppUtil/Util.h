@@ -119,29 +119,106 @@ namespace StringConverter
 	}
 
 
-	static LPCWSTR String2LPCWSTR(std::string orig)	{		size_t origsize = orig.length() + 1;		const size_t newsize = 100;		size_t convertedChars = 0;		wchar_t *wcstring = (wchar_t *)malloc(sizeof(wchar_t)*(orig.length() - 1));		mbstowcs_s(&convertedChars, wcstring, origsize, orig.c_str(), _TRUNCATE);		return wcstring;	}
-
-
-	static void replace_all(const std::string & str, const std::string & before, const std::string & after)
+	static LPCWSTR String2LPCWSTR(std::string orig)
 	{
-
-
+		size_t origsize = orig.length() + 1;
+		const size_t newsize = 100;
+		size_t convertedChars = 0;
+		wchar_t *wcstring = (wchar_t *)malloc(sizeof(wchar_t)*(orig.length() - 1));
+		mbstowcs_s(&convertedChars, wcstring, origsize, orig.c_str(), _TRUNCATE);
+		return wcstring;
 	}
 
-	static vector<string> splite(const string &str, const string & splite_char)
+
+	static int Find_First(const string & str, const string & special_char) // debug: 0.015  release: 0.0004 ms
+	{
+		if (str.size() - special_char.size() < 0) return -1;
+
+		int times = str.size() - special_char.size() + 1;
+
+		auto str1 = str.data();
+
+		auto str2 = special_char.data();
+
+
+		for (size_t i = 0; i < times; i++)
+		{
+			if (str1[i] == str2[0])
+			{
+				if (special_char.size() == 1) return i;
+
+				for (size_t j = 1; j < special_char.size(); j++)
+				{
+					if (str1[i + j] != str2[j])
+					{
+						break;
+					}
+					if (j == special_char.size() - 1) return i;
+				}
+
+			}
+		}
+
+		return -1;
+	}
+
+
+	static vector<string> Split(const string & str, const string & splite_char)  //debug: 0.1ms  release: 0.008ms
 	{
 
 		int pos = -1;
 
+		vector<string> list;
+
 		string temp = str;
 
-		while (int pos = temp.find(splite_char) <= temp.size())
+		bool flag = true;
+
+		while (flag)
 		{
+			int pos = Find_First(temp, splite_char);
 
+			if (pos < temp.size())
+			{
+				list.push_back(temp.substr(0, pos));
 
+				temp.erase(0, pos + splite_char.size());
+			}
+			else
+			{
+				flag = false;
+			}
 		}
 
+		list.push_back(temp);
+
+		return list;
 	}
+
+
+	static string Replace_All(std::string & str, const std::string & before, const std::string & after) // debug: 0.04ms  release: 0.004ms
+	{
+		int pos = -1;
+
+		bool flag = true;
+
+		while (flag)
+		{
+			int pos = Find_First(str, before);
+
+			if (pos > -1)
+			{
+				str.erase(pos, before.size());
+
+				str.insert(pos, after);
+			}
+			else
+			{
+				return str;
+			}
+		}
+	}
+
 
 }
 
