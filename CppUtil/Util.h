@@ -17,9 +17,17 @@
 #include <Tlhelp32.h>
 
 
+#include  <direct.h>  
+#include <Shlwapi.h>
 
+
+#include <regex>
+
+
+#pragma comment(lib,"Shlwapi.lib")
 
 using namespace std;
+
 
 namespace StringConverter
 {
@@ -96,7 +104,7 @@ namespace StringConverter
 	}
 
 
-	static LPWSTR IntToLPWSTR(long long n)
+	static LPWSTR Int2LPWSTR(long long n)
 	{
 		strstream ss;
 		string s;
@@ -111,9 +119,95 @@ namespace StringConverter
 	}
 
 
-	static LPCWSTR stringToLPCWSTR(std::string orig)	{		size_t origsize = orig.length() + 1;		const size_t newsize = 100;		size_t convertedChars = 0;		wchar_t *wcstring = (wchar_t *)malloc(sizeof(wchar_t)*(orig.length() - 1));		mbstowcs_s(&convertedChars, wcstring, origsize, orig.c_str(), _TRUNCATE);		return wcstring;	}
+	static LPCWSTR String2LPCWSTR(std::string orig)	{		size_t origsize = orig.length() + 1;		const size_t newsize = 100;		size_t convertedChars = 0;		wchar_t *wcstring = (wchar_t *)malloc(sizeof(wchar_t)*(orig.length() - 1));		mbstowcs_s(&convertedChars, wcstring, origsize, orig.c_str(), _TRUNCATE);		return wcstring;	}
+
+
+	static void replace_all(const std::string & str, const std::string & before, const std::string & after)
+	{
+
+
+	}
+
+	static vector<string> splite(const string &str, const string & splite_char)
+	{
+
+		int pos = -1;
+
+		string temp = str;
+
+		while (int pos = temp.find(splite_char) <= temp.size())
+		{
+
+
+		}
+
+	}
 
 }
+
+
+
+class Stopwatch
+{
+private:
+
+	LARGE_INTEGER  nFreq;
+
+	LARGE_INTEGER nBeginTime;
+
+	LARGE_INTEGER nEndTime;
+
+	unsigned long time;
+
+public:
+
+	Stopwatch()
+	{
+		QueryPerformanceFrequency(&nFreq);
+	}
+
+	void Start()
+	{
+		if (nFreq.QuadPart == NULL)
+		{
+			QueryPerformanceFrequency(&nFreq);
+		}
+
+		QueryPerformanceCounter(&nBeginTime);
+
+	}
+
+
+	//单位为毫秒
+	double Stop()
+	{
+		if (nBeginTime.QuadPart == 0)
+		{
+			return 0;
+		}
+
+		QueryPerformanceCounter(&nEndTime);
+
+		auto time = (nEndTime.QuadPart - nBeginTime.QuadPart)*1000.0 / nFreq.QuadPart;
+
+		nBeginTime.QuadPart = 0;
+
+		return time;
+
+	}
+
+
+	~Stopwatch() = default;
+
+
+
+	static unsigned __int64 GetSystemTime()  //最小精度是 16ms
+	{
+		return GetTickCount64();
+	}
+
+
+};
 
 
 
@@ -151,5 +245,109 @@ static list<string> GetCurrentProcesses()
 	CloseHandle(hProcessSnap);
 
 	return list;
+
+};
+
+
+
+class FileOperation
+{
+
+public:
+
+	/*static bool CheckPath(const string & str)
+	{
+
+		regex pattern("^[A-Za-z]{1}:\\\\.*");
+
+		string s = str.replace("", "");
+
+		return regex_match(str.replace("", ""), pattern);
+
+	}*/
+
+
+	static string GetCurrDirectory()
+	{
+
+		char buffer[1000];
+
+		getcwd(buffer, 1000);
+
+		return string(buffer);
+
+	}
+
+
+
+	static bool MakeFile(const string & file)
+	{
+
+		ofstream fout(file);
+
+		return fout.is_open();
+
+	}
+
+
+
+	static bool DirExist(const string & path)
+	{
+
+		return (chdir(path.c_str()) == 0);
+
+	}
+
+
+
+	static bool FileExist(const string & file)
+	{
+
+		struct stat buffer;
+
+		return (stat(file.c_str(), &buffer) == 0);
+
+	}
+
+
+
+	static bool MakeDir(const string & path)
+	{
+		if (mkdir(path.c_str()) == 0)
+		{
+			return true;
+		}
+		else
+		{
+
+
+		}
+	}
+
+
+
+	static void DeleteDir(const string & path, bool deletechild = true)
+	{
+
+		rmdir(path.c_str());
+
+	}
+
+
+
+	static string GetParentPath(const string& file)
+	{
+
+		auto temp = StringConverter::String2WChar(file.c_str());
+
+		PathRemoveFileSpec(temp);
+
+		return StringConverter::WChar2String(temp);
+
+	}
+
+
+
+
 
 };
