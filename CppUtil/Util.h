@@ -7,7 +7,9 @@
 
 #include <string>
 #include <strstream>
+#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string.h>
 #include <list>
 #include <map>
@@ -424,7 +426,31 @@ public:
 	}
 
 
+	static string ReadTextAll(const string & file)
+	{
+		ifstream ifs(file);
 
+		ostringstream out;
+
+		out << ifs.rdbuf();
+
+		ifs.close();
+
+		return out.str();
+	}
+
+
+	static void WriteTextAll(const string& file, const string & text)
+	{
+		ofstream ofs;
+
+		ofs.open(file);
+
+		ofs << text;
+
+		ofs.close();
+
+	}
 
 
 };
