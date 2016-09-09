@@ -7,7 +7,9 @@
 
 #include <string>
 #include <strstream>
+#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string.h>
 #include <vector>
 #include <list>
@@ -558,6 +560,20 @@ public:
 
 		return StringConverter::WChar2String(temp);
 
+	}
+
+
+	static string ReadTextAll(const string & file)
+	{
+		ifstream ifs(file);
+
+		ostringstream out;
+
+		out << ifs.rdbuf();
+
+		ifs.close();
+
+		return out.str();
 	}
 
 
