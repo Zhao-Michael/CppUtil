@@ -15,7 +15,6 @@ public:
 
 };
 
-int xx = 0;
 
 template<typename ValueType>
 class Holder :public PlaceHolder
