@@ -426,6 +426,69 @@ static list<string> GetCurrentProcesses()
 
 
 
+//************************************
+// Method:    执行非exe后缀名的程序
+// FullName:  StartProcessNoEXE
+// Access:    public static 
+// Returns:   void
+// Qualifier:
+// Parameter: wchar_t * path 执行文件路径
+// Parameter: wchar_t * arg  执行命令行参数
+//************************************
+static void StartProcessNoEXE(wchar_t* path, wchar_t* arg)
+{
+	STARTUPINFO si;
+
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&pi, sizeof(pi));
+
+	ZeroMemory(&si, sizeof(si));
+
+	si.cb = sizeof(si);
+
+	CreateProcess(path, arg, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+
+}
+
+
+
+
+//************************************
+// Method:    申请管理员权限执行EXE
+// FullName:  StartProcessAsAdmin
+// Access:    public static 
+// Returns:   void
+// Qualifier:
+// Parameter: wchar_t * path 执行文件路径
+// Parameter: wchar_t * arg  执行命令行参数
+//************************************
+static void StartEXEAsAdmin(wchar_t* path, wchar_t* arg)
+{
+	SHELLEXECUTEINFO info;
+
+	info.cbSize = sizeof(info);
+
+	info.fMask = SEE_MASK_NOCLOSEPROCESS;
+
+	info.lpVerb = L"runas";
+
+	info.nShow = SW_NORMAL;
+
+	info.lpDirectory = NULL;
+
+	info.lpParameters = arg;
+
+	info.lpFile = path;
+
+	ShellExecuteEx(&info);
+
+
+}
+
+
+
+
 class FileOperation
 {
 

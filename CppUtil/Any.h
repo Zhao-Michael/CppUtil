@@ -21,10 +21,7 @@ class Holder :public PlaceHolder
 {
 public:
 
-	Holder(const ValueType & value)
-	{
-		held = value;
-	};
+	Holder(const ValueType & value) :held(value) { };
 
 	Holder(ValueType&& value) : held(static_cast<ValueType>(value)) { }
 
