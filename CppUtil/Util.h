@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
+#include <vector>
 #include <list>
 #include <map>
 
@@ -47,6 +48,7 @@ namespace StringConverter
 		{ '8', 8 },
 		{ '9', 9 },
 	};
+
 
 	static map<int, char> map_int_char = {
 		{ 1, '1' },
@@ -95,6 +97,7 @@ namespace StringConverter
 
 		return sum;
 	}
+
 
 	static string Num2Str(long long num)
 	{
@@ -200,7 +203,7 @@ namespace StringConverter
 	}
 
 
-	static string Replace_All(std::string & str, const std::string & before, const std::string & after) // debug: 0.04ms  release: 0.004ms
+	static string Replace_All(std::string & str, const std::string & before, const std::string & after) //返回非引用结果 debug: 0.04ms  release: 0.004ms
 	{
 		int pos = -1;
 
@@ -221,6 +224,100 @@ namespace StringConverter
 				return str;
 			}
 		}
+	}
+
+
+	static bool StartWith(const string & str, const std::string & special_char)
+	{
+		if (str.size() < special_char.size()) return false;
+
+		auto strPtr = str.data();
+
+		auto charPtr = special_char.data();
+
+		for (size_t i = 0; i < special_char.size(); i++)
+		{
+			if (strPtr[i] != charPtr[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+
+	}
+
+
+	static bool EndWith(const std::string & str, const std::string & special_char)
+	{
+
+		if (str.size() < special_char.size()) return false;
+
+		auto strPtr = str.data();
+
+		auto charPtr = special_char.data();
+
+		for (size_t i = 1; i <= special_char.size(); i++)
+		{
+			if (strPtr[str.size() - i] != special_char[special_char.size() - i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+
+	}
+
+
+	static bool Contains(const std::string & str, const std::string & special_char)
+	{
+		return Find_First(str, special_char) >= 0;
+	}
+
+
+	static string Upper(const string & str)
+	{
+		string temp;
+
+		auto ptr = str.data();
+
+		for (size_t i = 0; i < str.size(); i++)
+		{
+			if (ptr[i] > 'a' && ptr[i] < 'z')
+			{
+				temp += ptr[i] - 32;
+			}
+			else
+			{
+				temp += ptr[i];
+			}
+		}
+
+		return temp;
+
+	}
+
+
+	static string Lower(const string & str)
+	{
+		string temp;
+
+		auto ptr = str.data();
+
+		for (size_t i = 0; i < str.size(); i++)
+		{
+			if (ptr[i] > 'A' && ptr[i] < 'Z')
+			{
+				temp += ptr[i] + 32;
+			}
+			else
+			{
+				temp += ptr[i];
+			}
+		}
+
+		return temp;
 	}
 
 
@@ -331,21 +428,86 @@ static list<string> GetCurrentProcesses()
 
 
 
+//************************************
+// Method:    执行非exe后缀名的程序
+// FullName:  StartProcessNoEXE
+// Access:    public static 
+// Returns:   void
+// Qualifier:
+// Parameter: wchar_t * path 执行文件路径
+// Parameter: wchar_t * arg  执行命令行参数
+//************************************
+static void StartProcessNoEXE(wchar_t* path, wchar_t* arg)
+{
+	STARTUPINFO si;
+
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&pi, sizeof(pi));
+
+	ZeroMemory(&si, sizeof(si));
+
+	si.cb = sizeof(si);
+
+	CreateProcess(path, arg, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+
+}
+
+
+
+
+//************************************
+// Method:    申请管理员权限执行EXE
+// FullName:  StartProcessAsAdmin
+// Access:    public static 
+// Returns:   void
+// Qualifier:
+// Parameter: wchar_t * path 执行文件路径
+// Parameter: wchar_t * arg  执行命令行参数
+//************************************
+static void StartEXEAsAdmin(wchar_t* path, wchar_t* arg)
+{
+	SHELLEXECUTEINFO info;
+
+	info.cbSize = sizeof(info);
+
+	info.fMask = SEE_MASK_NOCLOSEPROCESS;
+
+	info.lpVerb = L"runas";
+
+	info.nShow = SW_NORMAL;
+
+	info.lpDirectory = NULL;
+
+	info.lpParameters = arg;
+
+	info.lpFile = path;
+
+	ShellExecuteEx(&info);
+
+
+}
+
+
+
+
 class FileOperation
 {
 
 public:
 
-	/*static bool CheckPath(const string & str)
+	static bool CheckPath(const string & str)
 	{
+
+		string s_temp = str;
 
 		regex pattern("^[A-Za-z]{1}:\\\\.*");
 
-		string s = str.replace("", "");
+		StringConverter::Replace_All(s_temp, "/", "\\");
 
-		return regex_match(str.replace("", ""), pattern);
+		return regex_match(s_temp, pattern);
 
-	}*/
+	}
 
 
 	static string GetCurrDirectory()
@@ -392,22 +554,60 @@ public:
 
 
 
-	static bool MakeDir(const string & path)
+	static bool MakeDir(string & path, bool recursive = true)
 	{
-		if (mkdir(path.c_str()) == 0)
+
+		if (!recursive) return (mkdir(path.c_str()) == 0);
+
+		string t_path(StringConverter::Replace_All(path, "/", "\\"));
+
+		if (DirExist(path))
 		{
-			return true;
-		}
-		else
-		{
+			if (mkdir(path.c_str()) == 0)
+			{
+				return true;
+			}
+			else
+			{
+				auto vec = StringConverter::Split(t_path, "\\");
+
+				vector<string> vectorPath;
+
+				for (size_t i = 1; i < vec.size(); i++)
+				{
+					auto p = vec[0] + "\\";
+
+					for (size_t j = 0; j < i; j++)
+					{
+						p += vec[i];
+					}
+
+					vectorPath.push_back(p);
+				}
 
 
+
+
+
+				/*if (vec.size() <= 1) return false;
+
+				for (size_t i = 1; i < vec.size(); i++)
+				{
+					string temp = vec[0];
+
+					if (mkdir((temp + "\\").c_str()) != 0)
+					{
+
+					}
+				}*/
+			}
 		}
+
 	}
 
 
 
-	static void DeleteDir(const string & path, bool deletechild = true)
+	static void DeleteDir(const string & path, bool recursive = true)
 	{
 
 		rmdir(path.c_str());
@@ -442,16 +642,30 @@ public:
 	}
 
 
-	static void WriteTextAll(const string& file, const string & text)
+
+	static vector<string> GetAllParetDir(const string & path)
 	{
-		ofstream ofs;
 
-		ofs.open(file);
+		if (!CheckPath(path)) return vector<string>();
 
-		ofs << text;
+		auto vec = StringConverter::Split(path, "\\");
 
-		ofs.close();
+		vector<string> vectorPath;
 
+		for (size_t i = 1; i < vec.size(); i++)
+		{
+			string p;
+
+			for (size_t j = 0; j <= i; j++)
+			{
+				p += vec[j] + "\\" + "\\";
+			}
+
+			vectorPath.push_back(p.substr(0, p.size() - 2));
+
+		}
+
+		return vectorPath;
 	}
 
 
