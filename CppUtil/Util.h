@@ -86,6 +86,12 @@ namespace StringConverter
 	}
 
 
+	static string WChar2String(LPWSTR wide)
+	{
+		return WChar2String((wchar_t*)wide);
+	}
+
+
 	static long long Str2Num(string str)
 	{
 		long long sum = 0;
