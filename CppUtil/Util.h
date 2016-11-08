@@ -15,12 +15,15 @@
 #include <list>
 #include <map>
 
+#include <functional>
+#include <memory>
+
 #include <process.h>
 #include <Windows.h>
 #include <Tlhelp32.h>
 
 
-#include  <direct.h>  
+#include <direct.h>  
 #include <Shlwapi.h>
 
 #include <shlobj.h>
@@ -719,6 +722,44 @@ public:
 			CoUninitialize();
 		}
 		return false;
+	}
+
+};
+
+
+
+
+class ThreadManager {
+
+
+	static unsigned __stdcall RunFunc(void* arg)
+	{
+		shared_ptr<Holder> temp(static_cast<Holder*>(arg));
+
+		temp->mRunnable();
+
+		return 0;
+	}
+
+
+public:
+
+	typedef std::function<void()> Runnable;
+
+	class Holder
+	{
+	public:
+		Runnable mRunnable;
+
+		Holder(Runnable run) :mRunnable(run)
+		{
+		}
+
+	};
+
+	static void StartTask(Runnable run)
+	{
+		_beginthreadex(NULL, 0, RunFunc, new Holder(run), 0, 0);
 	}
 
 };

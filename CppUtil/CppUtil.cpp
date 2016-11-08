@@ -5,14 +5,27 @@
 int main()
 {
 
-	int sum = 0;
+	vector<int> vec = { 1,2,3,4,5,7,8,5 };
 
-	for (size_t i = 0; i <= 100; i++)
+
+	for (size_t i = 0; i < 100000; i++)
 	{
-		sum += i;
+		ThreadManager::StartTask([&] {
+
+			for each (auto & item in vec)
+			{
+				cout << item << endl;
+			}
+
+		});
+
+		Sleep(100);
+
 	}
 
-	cout << sum << endl;
+
+
+
 
 	system("Pause");
 
