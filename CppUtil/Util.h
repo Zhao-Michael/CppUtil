@@ -731,35 +731,37 @@ public:
 
 class ThreadManager {
 
-
-	static unsigned __stdcall RunFunc(void* arg)
-	{
-		shared_ptr<Holder> temp(static_cast<Holder*>(arg));
-
-		temp->mRunnable();
-
-		return 0;
-	}
-
-
 public:
 
-	typedef std::function<void()> Runnable;
-
+	template <typename T>
 	class Holder
 	{
 	public:
-		Runnable mRunnable;
+		T mRunnable;
 
-		Holder(Runnable run) :mRunnable(run)
+		Holder(const T run) :mRunnable(run)
 		{
 		}
 
+		void Run()
+		{
+			mRunnable();
+		}
+
+		static unsigned __stdcall RunFunc(void* arg)
+		{
+			shared_ptr<Holder> temp(static_cast<Holder*>(arg));
+
+			temp->Run();
+
+			return 0;
+		}
 	};
 
-	static void StartTask(Runnable run)
+	template <typename T>
+	static void StartTask(T run)
 	{
-		_beginthreadex(NULL, 0, RunFunc, new Holder(run), 0, 0);
+		_beginthreadex(NULL, 0, Holder<T>::RunFunc, new Holder<T>(run), 0, 0);
 	}
 
 };
