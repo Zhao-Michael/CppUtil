@@ -70,6 +70,7 @@ namespace TestForm
 
             Marshal.Copy((IntPtr)t, temp, 0, len);
 
+
         }
 
 
@@ -104,7 +105,7 @@ namespace TestForm
         {
             //声明传出数据： 一个MyStruct数组
 
-            const int len = 10000;
+            const int len = 100;
 
             MyStruct[] msarray = new MyStruct[len];
 
@@ -141,9 +142,7 @@ namespace TestForm
 
             Marshal.Copy(sendData, 0, sendPtr, len + 1);  //将传出指针数组拷贝到刚刚分配的非托管内存中
 
-
-            DllAPI.TestStructArray(sendPtr);  //将上面的非托管内存的指针传递到C++
-
+            DllAPI.TestStructArray(sendPtr, out IntPtr outPtr, out int outCount);  //将上面的非托管内存的指针传递到C++
 
             //下面删除刚刚在非托管内存中分配的内存
 
@@ -154,6 +153,11 @@ namespace TestForm
 
             ////////////////////////////////////  传送数据完成  /////////////////////////////////////////////
 
+            int[] outData = new int[outCount];
+
+            Marshal.Copy(outPtr, outData, 0, outCount);
+
+            var out1 = Marshal.PtrToStructure((IntPtr)outData[1], typeof(MyStruct));
 
         }
 
@@ -192,7 +196,7 @@ namespace TestForm
 
 
         [DllImport("PInvoke.dll", EntryPoint = "TestStructArray")]
-        public static extern int TestStructArray(IntPtr p);
+        public static extern int TestStructArray(IntPtr p, out IntPtr ptr, out int count);
 
 
         /// <summary>

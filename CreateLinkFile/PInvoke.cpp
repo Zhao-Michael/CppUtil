@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <Windows.h>
 #include <iostream>
+#include <string>
 
 
 using namespace std;
@@ -67,7 +68,7 @@ DLLAPI TestByteArray(BYTE* b, int & t, int & len)
 }
 
 
-struct MyStruct
+struct MyStruct  //传递结构时，结构中只能有简单类型，不能又复杂结构或类等
 {
 	int x;
 	double y;
@@ -87,21 +88,43 @@ DLLAPI TestStruct(MyStruct ms, MyStruct & ptr)
 }
 
 
-DLLAPI TestStructArray(int* b)
+DLLAPI TestStructArray(int* _in, int & _out, int & _outCount)
 {
 	int index = 0;
 
-	while (b[index] != 0)
+	while (_in[index] != 0)
 	{
-		MyStruct* f = (MyStruct*)(b[index]);
+		MyStruct* f = (MyStruct*)(_in[index]);
 
-		//cout << "X: " << f->x << "   Y: " << f->y << "    Z: " << f->z << endl;
+		cout << "X: " << f->x << "   Y: " << f->y << "    Z: " << f->z << endl;
 
 		index++;
 	}
 
+	//下面传送数据到C#  注意 char* 传出时应该设置字符为 Unicode 结尾要手动添加\0
+	_outCount = 100;
 
-	//cout << "end!!!" << endl;
+	int* _outPtr = new int[_outCount];
+
+	MyStruct* mys = new MyStruct[_outCount];
+
+	for (size_t i = 0; i < _outCount; i++)
+	{
+		MyStruct* t = new MyStruct();
+
+		t->x = i; t->y = i * 100; t->z = new char[100];
+
+		string ts = to_string(i);
+
+		memcpy(t->z, ts.data(), ts.size());
+
+		t->z[ts.size()] = '\0';
+
+		_outPtr[i] = (int)t;
+
+	}
+
+	_out = (int)_outPtr;
 
 	return 0;
 
