@@ -33,6 +33,8 @@
             this.button_ByteArray = new System.Windows.Forms.Button();
             this.button_Struct = new System.Windows.Forms.Button();
             this.button_StructAray = new System.Windows.Forms.Button();
+            this.buttonSelectSort = new System.Windows.Forms.Button();
+            this.buttonInsertSort = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button_Number
@@ -86,11 +88,33 @@
             this.button_StructAray.UseVisualStyleBackColor = true;
             this.button_StructAray.Click += new System.EventHandler(this.button_StructArray_Click);
             // 
+            // buttonSelectSort
+            // 
+            this.buttonSelectSort.Location = new System.Drawing.Point(381, 39);
+            this.buttonSelectSort.Name = "buttonSelectSort";
+            this.buttonSelectSort.Size = new System.Drawing.Size(145, 68);
+            this.buttonSelectSort.TabIndex = 2;
+            this.buttonSelectSort.Text = "选择排序";
+            this.buttonSelectSort.UseVisualStyleBackColor = true;
+            this.buttonSelectSort.Click += new System.EventHandler(this.buttonSelectSort_Click);
+            // 
+            // buttonInsertSort
+            // 
+            this.buttonInsertSort.Location = new System.Drawing.Point(381, 137);
+            this.buttonInsertSort.Name = "buttonInsertSort";
+            this.buttonInsertSort.Size = new System.Drawing.Size(145, 68);
+            this.buttonInsertSort.TabIndex = 2;
+            this.buttonInsertSort.Text = "插入排序";
+            this.buttonInsertSort.UseVisualStyleBackColor = true;
+            this.buttonInsertSort.Click += new System.EventHandler(this.buttonInsertSort_Click);
+            // 
             // PinvokeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(562, 540);
+            this.Controls.Add(this.buttonInsertSort);
+            this.Controls.Add(this.buttonSelectSort);
             this.Controls.Add(this.button_StructAray);
             this.Controls.Add(this.button_Struct);
             this.Controls.Add(this.button_ByteArray);
@@ -110,6 +134,8 @@
         private System.Windows.Forms.Button button_ByteArray;
         private System.Windows.Forms.Button button_Struct;
         private System.Windows.Forms.Button button_StructAray;
+        private System.Windows.Forms.Button buttonSelectSort;
+        private System.Windows.Forms.Button buttonInsertSort;
     }
 }
 

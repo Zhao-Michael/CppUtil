@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace TestForm
         public PinvokeForm()
         {
             InitializeComponent();
+
+            Sort.InitData();
         }
 
 
@@ -163,7 +166,15 @@ namespace TestForm
 
 
 
+        private void buttonSelectSort_Click(object sender, EventArgs e)
+        {
+            Sort.SelectSort(false);
+        }
 
+        private void buttonInsertSort_Click(object sender, EventArgs e)
+        {
+            Sort.InsertSort(false);
+        }
     }
 
 
@@ -258,5 +269,170 @@ namespace TestForm
     }
 
 
+    public static class Sort
+    {
+
+        public static void SelectSort(bool isAscend = true)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+
+            var src = N10000;
+
+            int N = src.Length;
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = i; j < N; j++)
+                {
+                    if (isAscend)
+                    {
+                        if (src[i] > src[j])
+                        {
+                            var temp = src[i];
+                            src[i] = src[j];
+                            src[j] = temp;
+                        }
+                    }
+                    else
+                    {
+                        if (src[i] < src[j])
+                        {
+                            var temp = src[i];
+                            src[i] = src[j];
+                            src[j] = temp;
+                        }
+                    }
+
+                }
+            }
+
+            sw.Stop();
+
+            Console.WriteLine("Select Sort :" + sw.ElapsedMilliseconds + " , " + IsSort(src, isAscend));
+        }
+
+        public static void InsertSort(bool isAscend = true)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+
+            var src = N10000;
+
+            int N = src.Length;
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < i; j++)
+                {
+                    if (isAscend)
+                    {
+                        if (src[j] > src[i])
+                        {
+                            var temp = src[i];
+
+                            for (int k = i; k > j; k--)
+                            {
+                                src[k] = src[k - 1];
+                            }
+
+                            src[j] = temp;
+                        }
+                    }
+                    else
+                    {
+                        if (src[j] < src[i])
+                        {
+                            var temp = src[i];
+
+                            for (int k = i; k > j; k--)
+                            {
+                                src[k] = src[k - 1];
+                            }
+
+                            src[j] = temp;
+                        }
+                    }
+                }
+            }
+
+            sw.Stop();
+
+            Console.WriteLine("Insert Sort :" + sw.ElapsedMilliseconds + " : " + IsSort(src, isAscend));
+
+        }
+
+
+        public static bool IsSort(int[] _in, bool isAscend = true)
+        {
+            int N = _in.Length - 1;
+
+            for (int i = 0; i < N; i++)
+            {
+                if (isAscend)
+                {
+                    if (_in[i] > _in[i + 1])
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (_in[i] < _in[i + 1])
+                    {
+                        return false;
+                    }
+                }
+
+            }
+            return true;
+        }
+
+        public static int[] N10 = new int[10];
+        public static int[] N100 = new int[100];
+        public static int[] N1000 = new int[1000];
+        public static int[] N10000 = new int[10000];
+        public static int[] N100000 = new int[100000];
+        public static int[] N1000000 = new int[1000000];
+
+        public static void InitData()
+        {
+
+            #region InitData
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < 10; i++)
+                    N10[i] = rnd.Next(1, 10);
+            }
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < 100; i++)
+                    N100[i] = rnd.Next(1, 100);
+            }
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < 1000; i++)
+                    N1000[i] = rnd.Next(1, 1000);
+            }
+
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < 10000; i++)
+                    N10000[i] = rnd.Next(1, 10000);
+            }
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < 100000; i++)
+                    N100000[i] = rnd.Next(1, 100000);
+            }
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < 1000000; i++)
+                    N1000000[i] = rnd.Next(1, 1000000);
+            }
+            #endregion
+
+        }
+
+
+    }
 
 }
