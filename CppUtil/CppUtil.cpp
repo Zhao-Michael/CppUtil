@@ -1,9 +1,13 @@
 #include <Util.h>
 #include <Any.h>
 
+void RunCpp14();
+
 
 int main()
 {
+	RunCpp14();
+
 	int money, i, k; float fund, net_value[6], to_va_in[5], sum = 0;
 
 	float Current_Value[6];
